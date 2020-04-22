@@ -44,6 +44,7 @@ const Autocomplete = ({ onSelect }) => {
 
   const handleSearch = (value) => {
     if (value) {
+      setSearchValue(value)
       fetch(
         `${MAPBOX_API_HOST}${MAPBOX_GEOCODING}mapbox.places/${value}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`
       )

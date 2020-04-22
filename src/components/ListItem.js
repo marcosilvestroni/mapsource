@@ -13,11 +13,14 @@ const WrapperText = styled.div`
 const HeaderType = styled.h3`
   font-size: 3rem;
 `;
+const Img = styled.img`
+    max-width:100%;
+`
 const ListItem = ({ position }) => {
   return (
     <WrapperItem>
       <WrapperImage>
-        <img src={position.image} alt={position.name} />
+        <Img src={position.image} alt={position.name} />
       </WrapperImage>
       <WrapperText>
         <HeaderType>{position.category}</HeaderType>
