@@ -8,27 +8,12 @@ const Ul = styled.ul`
 const Li = styled.li`
   line-height: 1.3rem;
 `;
-const Filters = ({ changeFilter }) => {
-  const [filters, setFilters] = useState([]);
+const Filters = ({ filters, changeFilter }) => {
+  
   const [current, setCurrent] = useState(null);
 
-  useEffect(() => {
-    if (!filters.length) {
-      fetch(PORTFOLIO_ENTRIES)
-        .then((data) => data.json())
-        .then((dataParsed) =>
-          setFilters(
-            dataParsed.map(({ id, name }) => ({
-              id,
-              name,
-            }))
-          )
-        );
-    }
-  });
-
   const handlChange = (e) => {
-    setCurrent(e.target.value);
+    setCurrent(parseInt(e.target.value));
     changeFilter(e.target.value);
   };
 

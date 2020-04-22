@@ -5,7 +5,7 @@ import Autocomplete from "./components/Autocomplete";
 import Filters from "./components/Filters";
 import ListItem from "./components/ListItem";
 import { sortDataForUsersPosition } from "./utils";
-import { PORTFOLIO } from "./constants/wordpress";
+import { PORTFOLIO ,PORTFOLIO_ENTRIES} from "./constants/wordpress";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
@@ -26,6 +26,7 @@ const FiltersContainer = styled.div`
   min-width: 20%;
   text-align: center;
   background-color: #f3f2f1;
+  display: flex;
 `;
 
 const ListSection = styled.div`
@@ -37,6 +38,7 @@ function App() {
   const [mapManager, setMapManager] = useState();
   const [userMarker, setUserMarker] = useState(null);
   const [shopsMarkers, setShopsMarkers] = useState([]);
+  const [filters, setFilters] = useState([]);
   const [filterValue, setFilterValue] = useState(null);
 
   const mapContainer = useRef(null);
@@ -114,6 +116,18 @@ function App() {
   };
 
   useEffect(() => {
+    if (!filters.length) {
+      fetch(PORTFOLIO_ENTRIES)
+        .then((data) => data.json())
+        .then((dataParsed) =>
+          setFilters(
+            dataParsed.map(({ id, name }) => ({
+              id,
+              name,
+            }))
+          )
+        );
+    }
     if (!mapManager) {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
@@ -162,22 +176,29 @@ function App() {
     }
   }, [filterValue, fitBoundsMap, mapManager, shopsMarkers]);
 
+
+
+  
+
   return (
     <MainContainer>
       <Autocomplete onSelect={onSelect} />
       <SectionMap>
         <FiltersContainer>
-          <Filters changeFilter={setFilterValue} />
+          <Filters changeFilter={setFilterValue} filters={filters} />
         </FiltersContainer>
         <MapContainer ref={mapContainer} />
       </SectionMap>
       <ListSection>
-        {shopsMarkers.forEach((elm) => {
-          if (elm.positionData.category == filterValue) {
-            return (
-              <ListItem key={elm.positionData.id} position={elm.positionData} />
-            );
+        {shopsMarkers.map((elm) => {
+          if(filterValue){
+            if(elm.positionData.category == filterValue){
+              return <ListItem key={elm.positionData.id} position={elm.positionData} types={filters} />
+            }
+          }else{
+              return <ListItem key={elm.positionData.id} position={elm.positionData} types={filters} />
           }
+          
         })}
       </ListSection>
     </MainContainer>

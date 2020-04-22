@@ -16,14 +16,20 @@ const HeaderType = styled.h3`
 const Img = styled.img`
     max-width:100%;
 `
-const ListItem = ({ position }) => {
+const ListItem = ({ position , types }) => {
+  console.log(types)
+  const typeName = ()=>{
+
+    return types.length ? types.filter(elm=>elm.id==position.category)[0].name : ''
+  }
+
   return (
     <WrapperItem>
       <WrapperImage>
         <Img src={position.image} alt={position.name} />
       </WrapperImage>
       <WrapperText>
-        <HeaderType>{position.category}</HeaderType>
+        <HeaderType>{typeName()}</HeaderType>
         <div dangerouslySetInnerHTML={{ __html: position.content }} />
       </WrapperText>
     </WrapperItem>
