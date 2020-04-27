@@ -53,7 +53,7 @@ const AutocompleteItem = styled.div`
 const Autocomplete = ({ onSelect }) => {
   const [options, setOptions] = useState([]);
   const [searchValue, setSearchValue] = useState();
-  const { get, loading, error, response } = useFetch(
+  const { get, response } = useFetch(
     `${MAPBOX_API_HOST}${MAPBOX_GEOCODING}${MAPBOX_SERVICE}`
   );
 
