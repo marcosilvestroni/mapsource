@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   MAPBOX_API_HOST,
   MAPBOX_GEOCODING,
@@ -6,6 +6,7 @@ import {
 } from "../constants/mapbox";
 import styled from "styled-components";
 import AutocompleteReact from "react-autocomplete";
+import useFetch from "use-http";
 
 const AutocompleteContainer = styled.div`
   width: 100%;
@@ -42,6 +43,7 @@ const AutocompleteItem = styled.div`
   background: #fff;
   cursor: pointer;
   line-height: 1.8rem;
+  padding: 0.8rem;
   &:hover {
     background-color: black;
     color: white;
@@ -51,22 +53,28 @@ const AutocompleteItem = styled.div`
 const Autocomplete = ({ onSelect }) => {
   const [options, setOptions] = useState([]);
   const [searchValue, setSearchValue] = useState();
+  const { get, loading, error, response } = useFetch(
+    `${MAPBOX_API_HOST}${MAPBOX_GEOCODING}${MAPBOX_SERVICE}`
+  );
 
-  const handleSearch = (value) => {
+  const handleSearch = async (value) => {
     if (value) {
       setSearchValue(value);
-      fetch(
-        `${MAPBOX_API_HOST}${MAPBOX_GEOCODING}${MAPBOX_SERVICE}/${value}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`
-      )
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          const options = (
-            data.features || []
-          ).map(({ id, place_name, center }) => ({ id, center, place_name }));
-          setOptions(options);
-        });
+
+      const data = await get(
+        `/${value}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`
+      );
+      if (response.ok) {
+        setOptions(
+          (data.features || []).map(({ id, place_name, center }) => ({
+            id,
+            center,
+            place_name,
+          }))
+        );
+      }
+    } else {
+      setSearchValue("");
     }
   };
 
@@ -98,7 +106,9 @@ const Autocomplete = ({ onSelect }) => {
             </AutocompleteItem>
           )}
           value={searchValue}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={(e) => {
+            handleSearch(e.target.value);
+          }}
           onSelect={(_, item) => handleSelect(item)}
         />
       </AutocompleteWrapper>
