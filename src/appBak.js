@@ -35,12 +35,13 @@ const ListSection = styled.div`
 `;
 
 function App() {
-  const mapContainer = useRef(null);
   const [mapManager, setMapManager] = useState();
   const [userMarker, setUserMarker] = useState(null);
   const [shopsMarkers, setShopsMarkers] = useState([]);
   const [filters, setFilters] = useState([]);
   const [filterValue, setFilterValue] = useState(null);
+
+  const mapContainer = useRef(null);
 
   const sanitizePosition = (position) => {
     return {
@@ -48,17 +49,13 @@ function App() {
       name: position.title.rendered,
       content: position.content.rendered,
       center: position.excerpt.rendered
-        ? position.excerpt.rendered
-            .replace("<p>", "")
-            .replace("</p>", "")
-            .replace("\n", "")
-            .replace(" ", "")
-            .split(",")
-            .reverse()
-        : null,
-      linkApiImage: position._links["wp:featuredmedia"]
-        ? position._links["wp:featuredmedia"][0].href
-        : null,
+        .replace("<p>", "")
+        .replace("</p>", "")
+        .replace("\n", "")
+        .replace(" ", "")
+        .split(",")
+        .reverse(),
+      /*image: dataParsed.media_details.sizes.medium_large.source_url,*/
       category: position.portfolio_entries,
     };
   };
@@ -69,17 +66,15 @@ function App() {
       let southwest = [];
       const shops = filterValue
         ? shopsMarkers.filter((m) => {
-          let condition
             if (filterValue) {
-              condition = m.positionData.category.includes(
+              const condition = m.positionData.category.includes(
                 parseInt(filterValue)
               );
               if (!condition) {
                 m.remove();
               }
-              
-          }
-          return condition;
+              return condition;
+            }
           })
         : shopsMarkers;
       const data = userMarker ? [shops[0], userMarker] : [...shops];
@@ -127,7 +122,7 @@ function App() {
     setShopsMarkers(sortDataForUsersPosition(shopsMarkers, markerUser));
   };
 
-  const retreveFilters = useCallback(() => {
+  useEffect(() => {
     if (!filters.length > 0) {
       fetch(PORTFOLIO_ENTRIES)
         .then((data) => data.json())
@@ -140,14 +135,11 @@ function App() {
           )
         );
     }
-  }, [filters.length]);
-
-  useEffect(() => {
     if (!mapManager) {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
-        style: "mapbox://styles/mapbox/streets-v11",
-        maxZoom: 16,
+        style: "mapbox://styles/mapbox/dark-v10",
+        maxZoom: 5,
         attributionControl: false,
         renderWorldCopies: false,
       });
@@ -157,74 +149,29 @@ function App() {
           maxWidth: 80,
         })
       );
-      fetch(PORTFOLIO)
-        .then((data) => data.json())
-        .then((dataParsed) => {
-          const data = dataParsed.map((position) => sanitizePosition(position));
-          const arrMarkers = [];
-          data.forEach((elm) => {
-            if (elm.center) {
+      setMapManager(map);
+    } else {
+      if (!shopsMarkers.length > 0) {
+        fetch(PORTFOLIO)
+          .then((data) => data.json())
+          .then((dataParsed) => {
+            const data = dataParsed.map((position) =>
+              sanitizePosition(position)
+            );
+            const arrMarkers = [];
+            data.forEach((elm) => {
               const marker = new mapboxgl.Marker()
                 .setLngLat({ lng: elm.center[0], lat: elm.center[1] })
                 .setPopup(new mapboxgl.Popup().setHTML(elm.content));
               arrMarkers.push(Object.assign(marker, { positionData: elm }));
-            }
+            });
+            setShopsMarkers(arrMarkers);
           });
-          setShopsMarkers(arrMarkers);
-        })
-        .catch((err) => console.log(err));
-      setMapManager(map);
-    } else {
-      if (shopsMarkers.length) fitBoundsMap();
-    }
-    retreveFilters();
-  }, [fitBoundsMap, mapManager, retreveFilters, shopsMarkers.length]);
-
-  const drawMarkers = () => {
-    shopsMarkers.forEach((elm) => {
-      elm.remove();
-      if (
-        filterValue &&
-        elm.positionData.category.includes(parseInt(filterValue))
-      ) {
-        elm.addTo(mapManager);
       } else {
-        if (!filterValue) elm.addTo(mapManager);
+        fitBoundsMap();
       }
-    });
-  };
-
-  const showList = () => {
-    const outArr = [];
-    shopsMarkers.forEach((elm) => {
-      if (!filterValue) {
-        outArr.push(
-          <ListItem
-            key={elm.positionData.id}
-            position={elm.positionData}
-            types={filters}
-          />
-        );
-      }
-
-      if (
-        filterValue &&
-        elm.positionData.category.includes(parseInt(filterValue))
-      ) {
-        outArr.push(
-          <ListItem
-            key={elm.positionData.id}
-            position={elm.positionData}
-            types={filters}
-          />
-        );
-      }
-    });
-    return outArr;
-  };
-  if (mapManager) {
-    drawMarkers();
-  }
+    }
+  }, [filterValue, filters.length, fitBoundsMap, mapManager, shopsMarkers]);
 
   return (
     <MainContainer>
@@ -232,10 +179,35 @@ function App() {
       <SectionMap>
         <FiltersContainer>
           <Filters changeFilter={setFilterValue} filters={filters} />
+          <div>
+            <ul>
+              {shopsMarkers.map((elm) => (
+                <li>
+                  {elm.name}{" "}
+                  <button onClick={() => elm.addTo(mapManager)}>
+                    Aggiungi
+                  </button>
+                  <button onClick={() => elm.remove()}>Rimuovi</button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </FiltersContainer>
         <MapContainer ref={mapContainer} />
       </SectionMap>
-      <ListSection>{showList()}</ListSection>
+      <ListSection>
+        {shopsMarkers.map((elm) => {
+          if (!filterValue || elm.positionData.category == filterValue) {
+            return (
+              <ListItem
+                key={elm.positionData.id}
+                position={elm.positionData}
+                types={filters}
+              />
+            );
+          }
+        })}
+      </ListSection>
     </MainContainer>
   );
 }

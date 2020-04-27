@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import useFetch from "use-http";
 
 const WrapperItem = styled.div`
   display: flex;
@@ -14,19 +15,27 @@ const HeaderType = styled.h3`
   font-size: 3rem;
 `;
 const Img = styled.img`
-    max-width:100%;
-`
-const ListItem = ({ position , types }) => {
-  console.log(types)
-  const typeName = ()=>{
+  max-width: 100%;
+`;
+const ListItem = React.memo(({ position, types }) => {
+  const { loading, error, data = {} } = useFetch(position.linkApiImage, {}, []);
 
-    return types.length ? types.filter(elm=>elm.id==position.category)[0].name : ''
-  }
-
+  const typeName = () => {
+    return types.length
+      ? types.filter((elm) => elm.id === parseInt(position.category))[0].name
+      : "";
+  };
   return (
     <WrapperItem>
       <WrapperImage>
-        <Img src={position.image} alt={position.name} />
+        {loading && "loading image"}
+        {error && "error retrieving image"}
+        {data.media_details ? (
+          <Img
+            src={data.media_details.sizes.medium_large.source_url}
+            alt={position.name}
+          />
+        ) : null}
       </WrapperImage>
       <WrapperText>
         <HeaderType>{typeName()}</HeaderType>
@@ -34,6 +43,6 @@ const ListItem = ({ position , types }) => {
       </WrapperText>
     </WrapperItem>
   );
-};
+});
 
 export default ListItem;

@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { PORTFOLIO_ENTRIES } from "../constants/wordpress";
 
 const Ul = styled.ul`
   list-style-type: none;
 `;
 const Li = styled.li`
-  line-height: 1.3rem;
+  line-height: 1.6rem;
+`;
+
+const WrapperFilters = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction:column;
 `;
 const Filters = ({ filters, changeFilter }) => {
-  
   const [current, setCurrent] = useState(null);
 
   const handlChange = (e) => {
@@ -18,7 +22,7 @@ const Filters = ({ filters, changeFilter }) => {
   };
 
   return (
-    <div>
+    <WrapperFilters>
       <h3>Filtri</h3>
       <Ul>
         {filters.map((elm) => (
@@ -35,7 +39,7 @@ const Filters = ({ filters, changeFilter }) => {
           </Li>
         ))}
       </Ul>
-    </div>
+    </WrapperFilters>
   );
 };
 

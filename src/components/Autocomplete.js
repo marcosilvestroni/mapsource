@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { MAPBOX_API_HOST, MAPBOX_GEOCODING ,MAPBOX_SERVICE} from "../constants/mapbox";
+import {
+  MAPBOX_API_HOST,
+  MAPBOX_GEOCODING,
+  MAPBOX_SERVICE,
+} from "../constants/mapbox";
 import styled from "styled-components";
 
 const AutocompleteContainer = styled.div`
@@ -36,10 +40,10 @@ const AutocompleteWrapperList = styled.div`
 const AutocompleteItem = styled.div`
   background: #fff;
   cursor: pointer;
-  line-height:1.8rem;
-  &:hover{
-    background-color:black;
-    color:white;
+  line-height: 1.8rem;
+  &:hover {
+    background-color: black;
+    color: white;
   }
 `;
 
@@ -49,7 +53,7 @@ const Autocomplete = ({ onSelect }) => {
 
   const handleSearch = (value) => {
     if (value) {
-      setSearchValue(value)
+      setSearchValue(value);
       fetch(
         `${MAPBOX_API_HOST}${MAPBOX_GEOCODING}${MAPBOX_SERVICE}/${value}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`
       )
@@ -66,16 +70,15 @@ const Autocomplete = ({ onSelect }) => {
   };
 
   const selectElement = (elm) => {
-    setSearchValue(elm.place_name)
+    setSearchValue(elm.place_name);
     setOptions([]);
     onSelect(elm);
   };
 
-  const handleArrow = (e)=>{
-    if(e.keyCode===40 && options.lenght){
-
+  const handleArrow = (e) => {
+    if (e.keyCode === 40 && options.lenght) {
     }
-  }
+  };
 
   return (
     <AutocompleteContainer>
