@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   MAPBOX_API_HOST,
   MAPBOX_GEOCODING,
   MAPBOX_SERVICE,
 } from "../constants/mapbox";
 import styled from "styled-components";
+import AutocompleteReact from "react-autocomplete";
 
 const AutocompleteContainer = styled.div`
   width: 100%;
@@ -69,32 +70,37 @@ const Autocomplete = ({ onSelect }) => {
     }
   };
 
-  const selectElement = (elm) => {
+  const handleSelect = (elm) => {
     setSearchValue(elm.place_name);
     setOptions([]);
     onSelect(elm);
   };
 
-  const handleArrow = (e) => {
-    if (e.keyCode === 40 && options.lenght) {
-    }
-  };
-
   return (
     <AutocompleteContainer>
       <AutocompleteWrapper>
-        <AutocompleteInput
+        <AutocompleteReact
+          getItemValue={(option) => option.place_name}
+          items={options}
+          renderInput={(props) => <AutocompleteInput {...props} />}
+          renderMenu={(items, value, style) => (
+            <AutocompleteWrapperList children={items} />
+          )}
+          renderItem={(item, isHighlighted) => (
+            <AutocompleteItem
+              key={item.id}
+              style={{
+                backgroundColor: isHighlighted ? "#000" : "#fff",
+                color: isHighlighted ? "#fff" : "#000",
+              }}
+            >
+              {item.place_name}
+            </AutocompleteItem>
+          )}
+          value={searchValue}
           onChange={(e) => handleSearch(e.target.value)}
-          onKeyDown={handleArrow}
+          onSelect={(_, item) => handleSelect(item)}
         />
-        <AutocompleteWrapperList>
-          {options &&
-            options.map((elm) => (
-              <AutocompleteItem key={elm.id} onClick={() => selectElement(elm)}>
-                {elm.place_name}
-              </AutocompleteItem>
-            ))}
-        </AutocompleteWrapperList>
       </AutocompleteWrapper>
     </AutocompleteContainer>
   );

@@ -69,7 +69,7 @@ function App() {
       let southwest = [];
       const shops = filterValue
         ? shopsMarkers.filter((m) => {
-          let condition
+            let condition;
             if (filterValue) {
               condition = m.positionData.category.includes(
                 parseInt(filterValue)
@@ -77,9 +77,8 @@ function App() {
               if (!condition) {
                 m.remove();
               }
-              
-          }
-          return condition;
+            }
+            return condition;
           })
         : shopsMarkers;
       const data = userMarker ? [shops[0], userMarker] : [...shops];
@@ -117,9 +116,7 @@ function App() {
       userMarker.remove();
     }
     mapManager.flyTo({ center: elm.center, zoom: 12 });
-    const markerUser = new mapboxgl.Marker({
-      color: "#e30613",
-    })
+    const markerUser = new mapboxgl.Marker()
       .setLngLat(elm.center)
       .setPopup(new mapboxgl.Popup().setText("La tua posizione"))
       .addTo(mapManager);
@@ -164,7 +161,9 @@ function App() {
           const arrMarkers = [];
           data.forEach((elm) => {
             if (elm.center) {
-              const marker = new mapboxgl.Marker()
+              const marker = new mapboxgl.Marker({
+                color: "#e30613",
+              })
                 .setLngLat({ lng: elm.center[0], lat: elm.center[1] })
                 .setPopup(new mapboxgl.Popup().setHTML(elm.content));
               arrMarkers.push(Object.assign(marker, { positionData: elm }));
