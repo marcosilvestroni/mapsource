@@ -109,7 +109,7 @@ function App() {
     };
 
     const bounds = await getBounds();
-    mapManager.fitBounds(bounds, { padding: 200 });
+    mapManager.fitBounds(bounds, { padding: 130 });
   }, [filterValue, mapManager, shopsMarkers, userMarker]);
 
   const onSelect = (elm) => {
@@ -158,7 +158,9 @@ function App() {
       fetch(PORTFOLIO)
         .then((data) => data.json())
         .then((dataParsed) => {
-          const data = dataParsed.map((position) => sanitizePosition(position));
+          const data = dataParsed
+            .reverse()
+            .map((position) => sanitizePosition(position));
           const arrMarkers = [];
           data.forEach((elm) => {
             if (elm.center) {
