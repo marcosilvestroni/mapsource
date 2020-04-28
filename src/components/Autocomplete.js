@@ -7,6 +7,7 @@ import {
 import styled from "styled-components";
 import AutocompleteReact from "react-autocomplete";
 import useFetch from "use-http";
+import { getLocalizedText } from "../utils";
 
 const AutocompleteContainer = styled.div`
   width: 100%;
@@ -61,8 +62,11 @@ const Autocomplete = ({ onSelect }) => {
     if (value) {
       setSearchValue(value);
 
+      const lang =
+        window && window.location.href.indexOf("/en/") > -1 ? "en-us" : "it-it";
+
       const data = await get(
-        `/${value}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`
+        `/${value}.json?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}&language=${lang}`
       );
       if (response.ok) {
         setOptions(
@@ -90,7 +94,12 @@ const Autocomplete = ({ onSelect }) => {
         <AutocompleteReact
           getItemValue={(option) => option.place_name}
           items={options}
-          renderInput={(props) => <AutocompleteInput {...props} />}
+          renderInput={(props) => (
+            <AutocompleteInput
+              placeholder={getLocalizedText("search_placeholder")}
+              {...props}
+            />
+          )}
           renderMenu={(items, value, style) => (
             <AutocompleteWrapperList children={items} />
           )}

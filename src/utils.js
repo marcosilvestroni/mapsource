@@ -1,3 +1,6 @@
+import it from "./langs/it-it";
+import en from "./langs/en-us";
+
 const getDistanceFromPoints = (p1, p2) => {
   const R = 6372.795477598;
   const a = {
@@ -41,4 +44,9 @@ export const sortDataForUsersPosition = (data, userPosition) => {
     }
     return 0;
   });
+};
+
+export const getLocalizedText = (key) => {
+  if (!window) return "";
+  return window.location.href.indexOf("/en/") > -1 ? en[key] : it[key];
 };

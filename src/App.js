@@ -6,6 +6,7 @@ import Filters from "./components/Filters";
 import ListItem from "./components/ListItem";
 import { sortDataForUsersPosition } from "./utils";
 import { PORTFOLIO, PORTFOLIO_ENTRIES } from "./constants/wordpress";
+import { getLocalizedText } from "./utils";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
@@ -118,7 +119,7 @@ function App() {
     mapManager.flyTo({ center: elm.center, zoom: 12 });
     const markerUser = new mapboxgl.Marker()
       .setLngLat(elm.center)
-      .setPopup(new mapboxgl.Popup().setText("La tua posizione"))
+      .setPopup(new mapboxgl.Popup().setText(getLocalizedText("your_position")))
       .addTo(mapManager);
     setUserMarker(markerUser);
     setShopsMarkers(sortDataForUsersPosition(shopsMarkers, markerUser));
