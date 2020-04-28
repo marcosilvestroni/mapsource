@@ -11,7 +11,6 @@ import { getLocalizedText } from "./utils";
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
 const MainContainer = styled.div`
-  padding: 4rem;
   display: flex;
   flex-direction: column;
 `;
