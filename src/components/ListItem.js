@@ -22,7 +22,7 @@ const ListItem = React.memo(({ position, types }) => {
 
   const typeName = () => {
     return types.length
-      ? types.filter((elm) => elm.id === parseInt(position.category))[0].name
+      ? types.filter(elm => elm.id === parseInt(position.category))[0].name
       : "";
   };
   return (
@@ -31,10 +31,7 @@ const ListItem = React.memo(({ position, types }) => {
         {loading && "loading image"}
         {error && "error retrieving image"}
         {data.media_details ? (
-          <Img
-            src={data.media_details.sizes.medium_large.source_url}
-            alt={position.name}
-          />
+          <Img src={data.source_url} alt={position.name} />
         ) : null}
       </WrapperImage>
       <WrapperText>
